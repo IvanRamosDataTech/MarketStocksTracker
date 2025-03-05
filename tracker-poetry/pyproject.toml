@@ -1,0 +1,20 @@
+[project]
+name = "tracker-poetry"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "IvanRamosDataTech",email = "ivanramos.datatech@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pendulum (>=3.0.0,<4.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "tracker_poetry", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

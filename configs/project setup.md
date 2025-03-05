@@ -18,7 +18,7 @@ then to install the defined dependencies for you project, just run
 
 > poetry install
 
-updater scripts helps to keep up with last changes from portfolio, gets a snapshot of last portfolio positions and bulks it into Postgresql database. To run this scrip, simply type
+updater scripts helps to keep up with last changes from portfolio, gets a snapshot of last portfolio positions and bulks it into Postgresql database. To run this scrip, simply type (inside marketstockstracker/tracker-poetry-src/tracker_poetry)
 > poetry run python updater.py
 
 If you need an additional library, all you have to do is run next command (inside )

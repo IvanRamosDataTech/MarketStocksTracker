@@ -29,7 +29,7 @@ If you need an additional library, all you have to do is run next command (insid
 Poetry makes project environment isolation one of its core features.
 By default, Poetry will try to use the Python version used during Poetry’s installation to create the virtual environment for the current project.
 
-By default, poetry will use associated virtual environment at the moment project was installed, you  can see that env by
+By default, poetry will use associated virtual environment at the moment project was installed, so move to `MarketStocksTracker/tracker-poetry` folder and you  can see that env by
 
 > poetry env info
 

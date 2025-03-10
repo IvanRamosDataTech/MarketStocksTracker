@@ -49,3 +49,12 @@ To remove currently activated virtual environment
 
 > poetry env remove
 
+## Database installation
+
+This project uses Postgresql as a database management system. 
+Install Postgresql & PgAdmin in your system. Login into your DB system using PGAdmin and make sure to open up a new Query Tool in the postgres default database
+
+From there, copy and paste contents of `create_database.sql` into your Query Tool and execute them as per instructions specified in script.
+
+Then a database `marketstockstracker` should be visible in Object Explorer. Open up a Query Tool from this new database.
+From there, Open up `create schema.sql` file using command Ctrl+o and execute its contents. Refresh your database schema and you should see tables there.

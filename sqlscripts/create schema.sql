@@ -11,20 +11,20 @@ DROP TABLE IF EXISTS public.ppr;
 
 CREATE TABLE public.ppr
 (
-    "Number" smallint NOT NULL,
-    "Name" character varying(70) NOT NULL,
-    "Ticker" character varying(10) NOT NULL,
-    "Shares" real NOT NULL,
-    "AverageUnitCost" real NOT NULL,
-    "CurrentUnitCost" real NOT NULL,
-    "PurchaseValue" real NOT NULL,
-    "MarketValue" real NOT NULL,
-    "ValueDifference" real NOT NULL,
-    "ValueDifference%" real NOT NULL,
-    "CurrentWeight" real NOT NULL,
-    "DesiredWeight" real NOT NULL,
-    "UploadDate" date,
-    PRIMARY KEY ("Number")
+    "Number" character varying(10) NOT NULL,
+    "Name" character varying(70),
+    "Ticker" character varying(10),
+    "Shares" real,
+    "Average Unit Cost" real,
+    "Current Unit Cost" real,
+    "Purchased Value" numeric(15,2) NOT NULL,
+    "Market Value" numeric(15,2) NOT NULL,
+    "Balance" numeric(15,2) NOT NULL,
+    "Balance %" real NOT NULL,
+    "Current Weight %" real NOT NULL,
+    "Target Weight %" real NOT NULL,
+    "Snapshot ID" integer NOT NULL,
+    "Upload Date" date
 );
 
 ALTER TABLE IF EXISTS public.ppr

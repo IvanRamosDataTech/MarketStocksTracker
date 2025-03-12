@@ -41,3 +41,5 @@ def next_snapshot_ID(connection, table):
         return constants.DEFAULT_SNAPSHOT_ID
     finally:
         cursor.close()
+
+        

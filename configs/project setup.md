@@ -58,3 +58,22 @@ From there, copy and paste contents of `create_database.sql` into your Query Too
 
 Then a database `marketstockstracker` should be visible in Object Explorer. Open up a Query Tool from this new database.
 From there, Open up `create schema.sql` file using command Ctrl+o and execute its contents. Refresh your database schema and you should see tables there.
+
+## Database Configuration
+As security rule, this project uses environment variables to prevent exposing any sensitive password. Make sure to create a new file `MarketStocksTracker/tracker-poetry/src/tracker_poetry/.env` like following one with your own configurations.
+
+```
+# Python environment
+
+APP_ENVIRONMENT=Development
+APP_VERSION=0.1v
+
+# Database config
+
+DB_SERVER=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=marketstockstracker
+
+```

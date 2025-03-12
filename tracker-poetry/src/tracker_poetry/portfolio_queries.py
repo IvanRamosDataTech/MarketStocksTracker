@@ -1,6 +1,7 @@
 """
     This module defines pre configured queries for project
 """
+#TODO Convert this script into a class
 import psycopg2
 import constants
 from psycopg2 import sql
@@ -15,9 +16,10 @@ def next_snapshot_ID(connection, table):
         
         Input:
             connection - An active connection to postgresql database
+            table - table name to extract snapshot ID from
         Returns:
-            Last registerered matchweek plus one. If there's any problem 
-            with databse or season has not even started, then returns default matchweek "1"
+            Last registerered Snapshop ID plus one. If there's any problem 
+            with databse, then returns default snapshot ID "1"
     """
     try:
         cursor = connection.cursor()
@@ -42,4 +44,40 @@ def next_snapshot_ID(connection, table):
     finally:
         cursor.close()
 
+# TODO Adapt it to portfolio 
+def insert_snapshot(connection, to_table, dataframe):
+    """
+        Generates a Composed SQL object that contains all necessary SQL code to 
+        perform upserts into a postgresql table from dataframe as source.
         
+        Input:
+            connection - active Postgresql connection to database
+            to_table - target table name in format 'schema.table_name' to generate inserts 
+            dataframe - pandas dataframe containing all rows to be inserted
+        Returns:
+            Affected rows after insertion
+    """
+    insert_header = sql.SQL("INSERT INTO " + to_table + " ({fields})").format(
+        fields = sql.SQL(',').join([sql.Identifier(column) for column in dataframe.columns])
+    )
+    
+    values_array = []
+    for row in dataframe.iterrows():
+        values_array.append(sql.SQL(" ({values})").format(
+            values = sql.SQL(',').join([sql.Literal(value) for value in row[1].values])
+        ))
+    
+    insert_values = sql.SQL(' VALUES ') + sql.SQL(',').join(values_array)
+    insert_statement = date_config + insert_header + insert_values
+
+    try:
+        cursor = connection.cursor()
+        cursor.execute(insert_statement)
+        connection.commit()
+        return cursor.rowcount
+    except psycopg2.Error as e:
+        print("An error ocurred in database")
+        print (e)
+        return 0
+    finally:
+        cursor.close()

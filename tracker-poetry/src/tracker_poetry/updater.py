@@ -41,10 +41,6 @@ except psycopg2.Error as e:
 else:
     print (f'Connection to database "{DB_NAME}" stablished. Listening at port {DB_PORT}')
 
-# Find out next snapshot ID
-next_snapshot_ID = sqlmanager.next_snapshot_ID(connection, "ppr")
-
-
 
 
 ## Insightful output data whenever the script runs
@@ -52,12 +48,24 @@ print(f"==== Updating Database from Excel portfolio sheet .... ===== ")
 print(f"Running Updater ETL process Environment: {APP_ENVIRONMENT} version: {APP_VERSION} \n")
 
 
-print(f"Next Snapshot ID {next_snapshot_ID}")
-print(" from db")
+
+## Extract data from Excel master file
+
+ppr_snapshot = pd.read_excel("Portafolio Indizado_Patrimonial.xlsx", sheet_name="Indizado PPR", header=4)
+ppr_allianz = pd.read_excel("Portafolio Indizado_Patrimonial.xlsx", sheet_name="Allianz", header=None)
+
+last_ppr_update = ppr_allianz.iat[0, 1]
+print(f"Last Allianz report  {last_ppr_update} \n")
 
 
 
-#ppr_snapshot = pd.read_excel("Portafolio Indizado_Patrimonial.xlsx", sheet_name="Indizado PPR", header=4)
+## Transform it
+next_snapshot_ID = sqlmanager.next_snapshot_ID(connection, "ppr")
+ppr_snapshot["Snapshot ID"] = next_snapshot_ID
+ppr_snapshot["Upload Date"] = last_ppr_update
 
-#print(ppr_snapshot.head(20))
+## Load data into Database
 
+inserted_rows = sqlmanager.insert_snapshot(connection, "ppr", ppr_snapshot)
+
+print(f" PPR Snapshot captured. Rows affected: {inserted_rows}")

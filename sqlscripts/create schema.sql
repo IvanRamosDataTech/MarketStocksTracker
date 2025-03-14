@@ -23,8 +23,9 @@ CREATE TABLE public.ppr
     "Balance %" real NOT NULL,
     "Current Weight %" real NOT NULL,
     "Target Weight %" real NOT NULL,
+    "Statement Date" date,
     "Snapshot ID" integer NOT NULL,
-    "Upload Date" date
+    "Snapshot Timestamp" Timestamp
 );
 
 ALTER TABLE IF EXISTS public.ppr

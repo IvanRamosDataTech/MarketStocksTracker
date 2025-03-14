@@ -4,6 +4,7 @@ import portfolio_queries as sqlmanager
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from datetime import datetime
 
 ## Script setup
 pd.set_option('display.max_rows', 100)
@@ -40,7 +41,8 @@ print(f"Last Allianz report  {last_ppr_update} \n")
 ## Transform it
 next_snapshot_ID = sqlmanager.next_snapshot_ID(connection, "ppr")
 ppr_snapshot["Snapshot ID"] = next_snapshot_ID
-ppr_snapshot["Upload Date"] = last_ppr_update
+ppr_snapshot["Snapshot Timestamp"] = datetime.now()
+ppr_snapshot["Statement Date"] = last_ppr_update
 
 ## Load data into Database
 

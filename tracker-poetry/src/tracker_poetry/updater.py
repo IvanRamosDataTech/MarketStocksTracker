@@ -1,7 +1,5 @@
 
 import pandas as pd
-import numpy as np
-import psycopg2
 import portfolio_queries as sqlmanager
 import os
 from dotenv import load_dotenv
@@ -20,28 +18,8 @@ APP_ENVIRONMENT = os.getenv('APP_ENVIRONMENT')
 APP_VERSION = os.getenv('APP_VERSION')
 
 
-DB_SERVER = os.getenv('DB_SERVER')
-DB_PORT = os.getenv('DB_PORT')
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-DB_NAME = os.getenv('DB_NAME')
-
-
-try:
-    connection = psycopg2.connect(
-        host = DB_SERVER,
-        port = DB_PORT,
-        user = DB_USER,
-        password = DB_PASSWORD,
-        database = DB_NAME
-    )
-except psycopg2.Error as e:
-    print (f'Can not connect to the postgress database "{DB_NAME}". Make sure database server is running')
-    print (e)
-else:
-    print (f'Connection to database "{DB_NAME}" stablished. Listening at port {DB_PORT}')
-
-
+## Connect to database
+connection = sqlmanager.connect_to_database(environment=APP_ENVIRONMENT)
 
 ## Insightful output data whenever the script runs
 print(f"==== Updating Database from Excel portfolio sheet .... ===== ")

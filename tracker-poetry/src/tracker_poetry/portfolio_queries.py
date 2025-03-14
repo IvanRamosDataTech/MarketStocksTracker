@@ -1,14 +1,64 @@
 """
     This module defines pre configured queries for project
 """
-#TODO Convert this script into a class
+#TODO Convert this script into a class (connection will be handled as an internal object)
 import psycopg2
 import constants
+import os
 from psycopg2 import sql
 
 date_config = sql.SQL('SET datestyle = {date_style}; ').format(
     date_style = sql.Identifier(constants.DB_DATE_STYLE)
 )
+
+
+def connect_to_database(environment):
+    '''
+        Tries to connect to specific database according to selected environment
+        
+        environment - Environment to connect to . Expected "Development" or "Production"
+        
+        Returns a live Postgresql connection
+    '''
+    def env_credentials(environment):
+        '''
+        Returns specific connection information depending on the environment
+
+        server address, port, username, password, database name
+        '''
+        if environment == 'Development':
+            server = os.getenv('DB_SERVER_DEV')
+            port = os.getenv('DB_PORT_DEV')
+            username = os.getenv('DB_USER_DEV')
+            password = os.getenv('DB_PASSWORD_DEV')
+            database = os.getenv('DB_NAME_DEV')
+        elif environment == 'Production':
+            server = os.getenv('DB_SERVER')
+            port = os.getenv('DB_PORT')
+            username = os.getenv('DB_USER')
+            password = os.getenv('DB_PASSWORD')
+            database = os.getenv('DB_NAME')
+        else:
+            raise ValueError(f"Unknown environment {environment}")
+        
+        return server, port, username, password, database
+
+    try:
+        host, port, user, password, database = env_credentials(environment)
+        connection = psycopg2.connect(
+            host = host,
+            port = port,
+            user = user,
+            password = password,
+            database = database
+        )
+    except psycopg2.Error as e:
+        print (f'Can not connect to the postgress database "{DB_NAME}". Make sure database server is running')
+        print (e)
+    else:
+        print (f'Connection to database "{database}" stablished. Listening at port {port}')
+        return connection
+
 
 def next_snapshot_ID(connection, table):
     """

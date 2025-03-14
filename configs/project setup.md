@@ -64,12 +64,24 @@ As security rule, this project uses environment variables to prevent exposing an
 
 ```
 # Python environment
+DEV_ENV = "Development"
+PROD_ENV = "Production"
 
-APP_ENVIRONMENT=Development
+
+APP_ENVIRONMENT=DEV_ENV
 APP_VERSION=0.1v
 
 # Database config
 
+# Development database credentials
+DB_SERVER_DEV=
+DB_PORT_DEV=
+DB_USER_DEV=
+DB_PASSWORD_DEV=
+DB_NAME_DEV=marketstockstracker_dev
+
+
+# Production database deployment credentials
 DB_SERVER=
 DB_PORT=
 DB_USER=

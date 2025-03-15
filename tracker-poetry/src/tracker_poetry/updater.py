@@ -32,6 +32,9 @@ print(f"Running Updater ETL process Environment: {APP_ENVIRONMENT} version: {APP
 
 ppr_snapshot = pd.read_excel("Portafolio Indizado_Patrimonial.xlsx", sheet_name="Indizado PPR", header=4)
 ppr_allianz = pd.read_excel("Portafolio Indizado_Patrimonial.xlsx", sheet_name="Allianz", header=None)
+indexed_snapshot = pd.read_excel("Portafolio Indizado_Patrimonial.xlsx", sheet_name="Indizado FIRE", header=4)
+
+print(indexed_snapshot.head(20))
 
 last_ppr_update = ppr_allianz.iat[0, 1]
 print(f"Last Allianz report  {last_ppr_update} \n")
@@ -39,13 +42,19 @@ print(f"Last Allianz report  {last_ppr_update} \n")
 
 
 ## Transform it
-next_snapshot_ID = sqlmanager.next_snapshot_ID(connection, "ppr")
-ppr_snapshot["Snapshot ID"] = next_snapshot_ID
+next_ppr_snapshotID = sqlmanager.next_snapshot_ID(connection, "ppr")
+ppr_snapshot["Snapshot ID"] = next_ppr_snapshotID
 ppr_snapshot["Snapshot Timestamp"] = datetime.now()
 ppr_snapshot["Statement Date"] = last_ppr_update
 
+next_indexed_snapshotID = sqlmanager.next_snapshot_ID(connection, "indexed")
+indexed_snapshot["Snapshot ID"] = next_indexed_snapshotID
+indexed_snapshot["Snapshot Timestamp"] = datetime.now()
+
 ## Load data into Database
 
-inserted_rows = sqlmanager.insert_snapshot(connection, "ppr", ppr_snapshot)
+ppr_inserted_rows = sqlmanager.insert_snapshot(connection, "ppr", ppr_snapshot)
+indexed_inserted_rows = sqlmanager.insert_snapshot(connection, "indexed", indexed_snapshot)
 
-print(f" PPR Snapshot captured. Rows affected: {inserted_rows}")
+print(f" PPR Snapshot captured. Rows affected: {ppr_inserted_rows}")
+print(f" Indexed Based Strategy Snapshot captured. Rows affected: {indexed_inserted_rows}")

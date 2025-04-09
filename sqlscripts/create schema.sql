@@ -21,8 +21,7 @@ CREATE TABLE public.ppr
     "Market Value" numeric(15,2) NOT NULL,
     "Balance" numeric(15,2) NOT NULL,
     "Balance %" numeric(5,4) NOT NULL,
-    "Current Weight %" numeric(5,4) NOT NULL,
-    "Target Weight %" numeric(5,4) NOT NULL,
+    "Weight %" numeric(5,4) NOT NULL,
     "Statement Date" date,
     "Snapshot ID" integer NOT NULL,
     "Snapshot Timestamp" Timestamp

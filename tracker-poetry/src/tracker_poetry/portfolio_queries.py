@@ -94,6 +94,43 @@ def next_snapshot_ID(connection, table):
     finally:
         cursor.close()
 
+def last_update(connection, table):
+    """
+        Finds out last registered snapshot date in database. 
+        
+        Input:
+            connection - An active connection to postgresql database
+            table - table name to extract snapshot timestamp from from
+        Returns:
+            Last registerered date for a captured snapshot. If there's any problem 
+            with databse, then returns None"
+    """
+    try:
+        cursor = connection.cursor()
+        
+        select = sql.SQL("SELECT MAX({snapshot}) FROM public." + table).format(
+            snapshot = sql.Identifier("Snapshot Timestamp")
+        )
+        
+        select_statement = date_config + select
+
+        cursor.execute(select_statement)
+        next_snapshot_date = cursor.fetchone()
+        
+        # Next Snapshot Date
+        if next_snapshot_date[0] is None:
+            return constants.DEFAULT_SNAPSHOT_DATE
+        else:
+            # Next Snapshot ID
+            return next_snapshot_date[0]
+    except psycopg2.Error as e:
+        print ("An error ocurred in database")
+        print (e)
+        return constants.DEFAULT_SNAPSHOT_DATE
+    finally:
+        cursor.close()
+
+
 # TODO Adapt it to portfolio 
 def insert_snapshot(connection, to_table, dataframe):
     """

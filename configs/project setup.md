@@ -29,7 +29,7 @@ If you need an additional library, all you have to do is run next command (insid
 Poetry makes project environment isolation one of its core features.
 By default, Poetry will try to use the Python version used during Poetry’s installation to create the virtual environment for the current project.
 
-By default, poetry will use associated virtual environment at the moment project was installed, you  can see that env by
+By default, poetry will use associated virtual environment at the moment project was installed, so move to `MarketStocksTracker/tracker-poetry` folder and you  can see that env by
 
 > poetry env info
 
@@ -58,3 +58,34 @@ From there, copy and paste contents of `create_database.sql` into your Query Too
 
 Then a database `marketstockstracker` should be visible in Object Explorer. Open up a Query Tool from this new database.
 From there, Open up `create schema.sql` file using command Ctrl+o and execute its contents. Refresh your database schema and you should see tables there.
+
+## Database Configuration
+As security rule, this project uses environment variables to prevent exposing any sensitive password. Make sure to create a new file `MarketStocksTracker/tracker-poetry/src/tracker_poetry/.env` like following one with your own configurations.
+
+```
+# Python environment
+DEV_ENV = "Development"
+PROD_ENV = "Production"
+
+
+APP_ENVIRONMENT=DEV_ENV
+APP_VERSION=0.1v
+
+# Database config
+
+# Development database credentials
+DB_SERVER_DEV=
+DB_PORT_DEV=
+DB_USER_DEV=
+DB_PASSWORD_DEV=
+DB_NAME_DEV=marketstockstracker_dev
+
+
+# Production database deployment credentials
+DB_SERVER=
+DB_PORT=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=marketstockstracker
+
+```

@@ -11,20 +11,20 @@ DROP TABLE IF EXISTS public.ppr;
 
 CREATE TABLE public.ppr
 (
-    "Number" smallint NOT NULL,
-    "Name" character varying(70) NOT NULL,
-    "Ticker" character varying(10) NOT NULL,
-    "Shares" real NOT NULL,
-    "AverageUnitCost" real NOT NULL,
-    "CurrentUnitCost" real NOT NULL,
-    "PurchaseValue" real NOT NULL,
-    "MarketValue" real NOT NULL,
-    "ValueDifference" real NOT NULL,
-    "ValueDifference%" real NOT NULL,
-    "CurrentWeight" real NOT NULL,
-    "DesiredWeight" real NOT NULL,
-    "UploadDate" date,
-    PRIMARY KEY ("Number")
+    "Number" character varying(10) NOT NULL,
+    "Name" character varying(70),
+    "Ticker" character varying(10),
+    "Shares" real,
+    "Average Unit Cost" real,
+    "Current Unit Cost" real,
+    "Purchased Value" numeric(15,2) NOT NULL,
+    "Market Value" numeric(15,2) NOT NULL,
+    "Balance" numeric(15,2) NOT NULL,
+    "Balance %" numeric(5,4) NOT NULL,
+    "Weight %" numeric(5,4) NOT NULL,
+    "Statement Date" date,
+    "Snapshot ID" integer NOT NULL,
+    "Snapshot Timestamp" Timestamp
 );
 
 ALTER TABLE IF EXISTS public.ppr
@@ -40,20 +40,25 @@ DROP TABLE IF EXISTS public.indexed;
 
 CREATE TABLE public.indexed
 (
-    "Number" smallint NOT NULL,
-    "Name" character varying(70) NOT NULL,
-    "Ticker" character varying(10) NOT NULL,
-    "Shares" real NOT NULL,
-    "AverageUnitCost" real NOT NULL,
-    "CurrentUnitCost" real NOT NULL,
-    "PurchaseValue" real NOT NULL,
-    "MarketValue" real NOT NULL,
-    "ValueDifference" real NOT NULL,
-    "ValueDifference%" real NOT NULL,
-    "CurrentWeight" real NOT NULL,
-    "DesiredWeight" real NOT NULL,
-    "UploadDate" date,
-    PRIMARY KEY ("Number")
+    "Number" character varying(10) NOT NULL,
+    "Name" character varying(70),
+    "Ticker" character varying(10),
+    "Shares" real,
+    "To Buy" real,
+    "Average Unit Cost" real,
+    "Potential Average Unit Cost" real,
+    "Current Unit Cost" real,
+    "Unit Cost Diff %" numeric(5,4),
+    "Purchased Value" numeric(15,2) NOT NULL,
+    "Market Value" numeric(15,2) NOT NULL,
+    "Potential Market Value" numeric(15,2) NOT NULL,
+    "Balance" numeric(15,2) NOT NULL,
+    "Balance %" numeric(5,4) NOT NULL,
+    "Current Weight %" numeric(5,4) NOT NULL,
+    "Potential Weight %" numeric(5,4),
+    "Target Weight %" numeric(5,4) NOT NULL,
+    "Snapshot ID" integer NOT NULL,
+    "Snapshot Timestamp" Timestamp
 );
 
 ALTER TABLE IF EXISTS public.indexed

@@ -89,3 +89,15 @@ DB_PASSWORD=
 DB_NAME=marketstockstracker
 
 ```
+
+## Data source configuration
+
+You'll need to specify relative paths for excel files as data sources (when local extraction is preferred) and link urls (when remote extraction is selected) script will take info from as unique data source depending on the environment you are working on.
+
+# Excel file config
+
+# Development File path
+EXCEL_FILE_DEV = "./relative/path/to/dev excel.xlsx"
+
+#Production File path
+EXCEL_FILE = "./relative/path/to/prod excel.xlsx"

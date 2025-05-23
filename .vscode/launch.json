@@ -1,0 +1,13 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+        "name": "Python: Debug with Poetry",
+        "type": "python",
+        "request": "launch",
+        "program": "${workspaceFolder}/tracker-poetry/src/tracker_poetry/onedrivedownload.py",
+        "console": "integratedTerminal",
+        "justMyCode": true
+        }
+    ]
+}

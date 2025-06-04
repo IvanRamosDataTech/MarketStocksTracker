@@ -27,17 +27,36 @@ def download_file(access_token, item_path):
 def get_portfolio(portfolio_path, portfolio_name):
     """
     Reads the portfolio from an Excel file stored at a personal 
-    onedrive account and returns it as a DataFrame.
-    
-    :param filepath: OneDrive Path to the Excel file.
-    :param sheet_name: Name of the sheet to read.
+    OneDrive account and returns it as a DataFrame.
+
+    :param portfolio_path: OneDrive Path to the Excel file.
+    :param portfolio_name: Name of the sheet to read.
     :return: DataFrame containing the portfolio data.
     """
-    token = get_token()
-    file_bytes = download_file(token, portfolio_path)
-    # Read Excel from bytes
-    dataframe = pd.read_excel(pd.io.common.BytesIO(file_bytes), sheet_name=portfolio_name, header=None)
-    return dataframe
+    try:
+        token = get_token()
+    except Exception as e:
+        print(f"Error obtaining access token: {e}")
+        return pd.DataFrame()
+
+    try:
+        file_bytes = download_file(token, portfolio_path)
+    except requests.HTTPError as e:
+        print(f"HTTP error downloading file: {e}")
+        return pd.DataFrame()
+    except Exception as e:
+        print(f"Unexpected error downloading file: {e}")
+        return pd.DataFrame()
+
+    try:
+        dataframe = pd.read_excel(pd.io.common.BytesIO(file_bytes), sheet_name=portfolio_name, header=None)
+        return dataframe
+    except ValueError as e:
+        print(f"Value error reading Excel: {e}")
+        return pd.DataFrame()
+    except Exception as e:
+        print(f"Unexpected error reading Excel: {e}")
+        return pd.DataFrame()
 
 def main():
     item_path = "/Portfolios/DEV Portafolio Indizado_Patrimonial.xlsx"  # Change to your file's path

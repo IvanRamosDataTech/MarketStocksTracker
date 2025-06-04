@@ -1,16 +1,17 @@
+from pathlib import Path
+from dotenv import load_dotenv
 import msal
 import requests
 import pandas as pd
+import os
 
-# Azure App registration 
-CLIENT_ID = "03ad1e3e-524d-4408-aa98-41274583fec8"
 
 TENANT_ID = "consumers"  # For personal Microsoft accounts
 AUTHORITY = f"https://login.microsoftonline.com/{TENANT_ID}"
 SCOPES = ["Files.Read"]
 
 def get_token():
-    app = msal.PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
+    app = msal.PublicClientApplication(os.getenv("AZURE_APP_ID"), authority=AUTHORITY)
     flow = app.initiate_device_flow(scopes=SCOPES)
     print(flow["message"])  # Follow the printed instructions to authenticate
     result = app.acquire_token_by_device_flow(flow)
@@ -33,6 +34,8 @@ def get_portfolio(portfolio_path, portfolio_name):
     :param portfolio_name: Name of the sheet to read.
     :return: DataFrame containing the portfolio data.
     """
+    config_path = Path('.env')
+    load_dotenv(dotenv_path=config_path)  # Load environment variables from .env file
     try:
         token = get_token()
     except Exception as e:
@@ -59,6 +62,7 @@ def get_portfolio(portfolio_path, portfolio_name):
         return pd.DataFrame()
 
 def main():
+    
     item_path = "/Portfolios/DEV Portafolio Indizado_Patrimonial.xlsx"  # Change to your file's path
     # Read Excel from OneDrive
     df = get_portfolio(item_path, "Indizado PPR")

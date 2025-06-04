@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from datetime import datetime
 import argparse
+import onedrivedownloader as onedrive
 
 ## Definitions
 
@@ -55,6 +56,7 @@ def etl_equity(connection, filepath):
     
     return
 
+# TODO: Edit this function to read from a local file or a cloud file
 def get_data_source(environment):
     if environment == 'Development':
         return os.getenv('EXCEL_FILE_DEV')
@@ -99,18 +101,19 @@ print(f"Running Updater ETL process Environment: {args.env} version: {APP_VERSIO
 ## Connect to database
 connection = sqlmanager.connect_to_database(environment=args.env)
 
-excel_local_file = get_data_source(environment=args.env)
+#excel_local_file = get_data_source(environment=args.env)
+excel_cloud_file = onedrive.get_portfolio(f"/Portfolios/{os.getenv('EXCEL_FILE_DEV') if args.env == 'Development' else os.getenv('EXCEL_FILE')}")
 
 if 'All' in args.portfolios:
     print(f"Running All portfolio updates ...\n\n")
-    etl_ppr(connection, filepath=excel_local_file)
-    etl_indexed(connection, filepath=excel_local_file)
-    etl_equity(connection, filepath=excel_local_file)
+    etl_ppr(connection, filepath=excel_cloud_file)
+    etl_indexed(connection, filepath=excel_cloud_file)
+    etl_equity(connection, filepath=excel_cloud_file)
 else:
     if 'PPR' in args.portfolios:
-        etl_ppr(connection, filepath=excel_local_file)
+        etl_ppr(connection, filepath=excel_cloud_file)
     if 'Indexed' in args.portfolios:
-        etl_indexed(connection, filepath=excel_local_file)
+        etl_indexed(connection, filepath=excel_cloud_file)
     if 'Equity' in args.portfolios:
-        etl_equity(connection, filepath=excel_local_file)
+        etl_equity(connection, filepath=excel_cloud_file)
         

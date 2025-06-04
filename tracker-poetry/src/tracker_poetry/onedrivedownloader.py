@@ -25,14 +25,14 @@ def download_file(access_token, item_path):
     response.raise_for_status()
     return response.content
 
-def get_portfolio(portfolio_path, portfolio_name):
+def get_portfolio(portfolio_path):
     """
     Reads the portfolio from an Excel file stored at a personal 
     OneDrive account and returns it as a DataFrame.
 
     :param portfolio_path: OneDrive Path to the Excel file.
     :param portfolio_name: Name of the sheet to read.
-    :return: DataFrame containing the portfolio data.
+    :return: BytesIO object containing the portfolio data.
     """
     config_path = Path('.env')
     load_dotenv(dotenv_path=config_path)  # Load environment variables from .env file
@@ -52,20 +52,15 @@ def get_portfolio(portfolio_path, portfolio_name):
         return pd.DataFrame()
 
     try:
-        dataframe = pd.read_excel(pd.io.common.BytesIO(file_bytes), sheet_name=portfolio_name, header=None)
-        return dataframe
-    except ValueError as e:
-        print(f"Value error reading Excel: {e}")
-        return pd.DataFrame()
+        return pd.io.common.BytesIO(file_bytes) # Return the BytesIO object for further processing  
     except Exception as e:
-        print(f"Unexpected error reading Excel: {e}")
-        return pd.DataFrame()
+        print(f"Error creating BytesIO object: {e}")
+        return pd.io.common.BytesIO()
 
 def main():
-    
     item_path = "/Portfolios/DEV Portafolio Indizado_Patrimonial.xlsx"  # Change to your file's path
     # Read Excel from OneDrive
-    df = get_portfolio(item_path, "Indizado PPR")
+    df = pd.read_excel(get_portfolio(item_path), sheet_name="Indizado PPR", header=4)
     print(df.head(20))
 
 if __name__ == "__main__":

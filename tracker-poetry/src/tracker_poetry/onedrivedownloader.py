@@ -24,12 +24,25 @@ def download_file(access_token, item_path):
     response.raise_for_status()
     return response.content
 
-def main():
+def get_portfolio(portfolio_path, portfolio_name):
+    """
+    Reads the portfolio from an Excel file stored at a personal 
+    onedrive account and returns it as a DataFrame.
+    
+    :param filepath: OneDrive Path to the Excel file.
+    :param sheet_name: Name of the sheet to read.
+    :return: DataFrame containing the portfolio data.
+    """
     token = get_token()
-    item_path = "/Portfolios/DEV Portafolio Indizado_Patrimonial.xlsx"  # Change to your file's path
-    file_bytes = download_file(token, item_path)
+    file_bytes = download_file(token, portfolio_path)
     # Read Excel from bytes
-    df = pd.read_excel(pd.io.common.BytesIO(file_bytes), sheet_name="Indizado FIRE", header=None)
+    dataframe = pd.read_excel(pd.io.common.BytesIO(file_bytes), sheet_name=portfolio_name, header=None)
+    return dataframe
+
+def main():
+    item_path = "/Portfolios/DEV Portafolio Indizado_Patrimonial.xlsx"  # Change to your file's path
+    # Read Excel from OneDrive
+    df = get_portfolio(item_path, "Indizado PPR")
     print(df.head(20))
 
 if __name__ == "__main__":

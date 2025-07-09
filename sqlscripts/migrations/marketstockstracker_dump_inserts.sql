@@ -21,7 +21,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: indexed; Type: TABLE; Schema: public; Owner: admin
+-- Name: indexed; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.indexed (
@@ -48,17 +48,17 @@ CREATE TABLE public.indexed (
 );
 
 
-ALTER TABLE public.indexed OWNER TO admin;
+ALTER TABLE public.indexed OWNER TO postgres;
 
 --
--- Name: TABLE indexed; Type: COMMENT; Schema: public; Owner: admin
+-- Name: TABLE indexed; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.indexed IS 'All history of capital contributions to Indexed based investment strategy';
 
 
 --
--- Name: ppr; Type: TABLE; Schema: public; Owner: admin
+-- Name: ppr; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.ppr (
@@ -79,17 +79,17 @@ CREATE TABLE public.ppr (
 );
 
 
-ALTER TABLE public.ppr OWNER TO admin;
+ALTER TABLE public.ppr OWNER TO postgres;
 
 --
--- Name: TABLE ppr; Type: COMMENT; Schema: public; Owner: admin
+-- Name: TABLE ppr; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.ppr IS 'All history of capital contributions to Private pension Plan';
 
 
 --
--- Data for Name: indexed; Type: TABLE DATA; Schema: public; Owner: admin
+-- Data for Name: indexed; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 INSERT INTO public.indexed VALUES ('1', 'Estados Unidos', 'SPLG', 5, 0, 1318, 1318, 1332, 0.0106, 6590.00, 6660.00, 6660.00, 70.00, 0.0106, 0.4255, 0.3621, 0.4000, 1, '2025-04-09 11:44:33.677763', NULL);
@@ -204,7 +204,7 @@ INSERT INTO public.indexed VALUES ('Total', 'NaN', 'NaN', 'NaN', 22478.814, 'NaN
 
 
 --
--- Data for Name: ppr; Type: TABLE DATA; Schema: public; Owner: admin
+-- Data for Name: ppr; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 INSERT INTO public.ppr VALUES ('1', 'Allianz Nasdaq', '151NQ', 265.8168, 113.77535, 116.4903, 30243.40, 30965.07, 721.67, 0.0239, 0.2000, '2024-04-30', 1, '2025-04-09 15:24:33.429586');

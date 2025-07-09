@@ -97,6 +97,7 @@ EXCEL_FILE = "Portafolio Indizado_Patrimonial.xlsx"
 # Azure App registration 
 AZURE_APP_ID = "your-azure-app-id"
 
+
 ```
 
 ## Data source configuration

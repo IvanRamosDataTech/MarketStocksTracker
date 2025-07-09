@@ -21,7 +21,7 @@ SET default_tablespace = '';
 SET default_table_access_method = heap;
 
 --
--- Name: indexed; Type: TABLE; Schema: public; Owner: admin
+-- Name: indexed; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.indexed (
@@ -48,17 +48,17 @@ CREATE TABLE public.indexed (
 );
 
 
-ALTER TABLE public.indexed OWNER TO admin;
+ALTER TABLE public.indexed OWNER TO postgres;
 
 --
--- Name: TABLE indexed; Type: COMMENT; Schema: public; Owner: admin
+-- Name: TABLE indexed; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.indexed IS 'All history of capital contributions to Indexed based investment strategy';
 
 
 --
--- Name: ppr; Type: TABLE; Schema: public; Owner: admin
+-- Name: ppr; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.ppr (
@@ -79,17 +79,17 @@ CREATE TABLE public.ppr (
 );
 
 
-ALTER TABLE public.ppr OWNER TO admin;
+ALTER TABLE public.ppr OWNER TO postgres;
 
 --
--- Name: TABLE ppr; Type: COMMENT; Schema: public; Owner: admin
+-- Name: TABLE ppr; Type: COMMENT; Schema: public; Owner: postgres
 --
 
 COMMENT ON TABLE public.ppr IS 'All history of capital contributions to Private pension Plan';
 
 
 --
--- Data for Name: indexed; Type: TABLE DATA; Schema: public; Owner: admin
+-- Data for Name: indexed; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.indexed ("Number", "Name", "Ticker", "Shares", "To Buy", "Average Unit Cost", "Potential Average Unit Cost", "Current Unit Cost", "Unit Cost Diff %", "Purchased Value", "Market Value", "Potential Purchased Value", "Balance", "Balance %", "Current Weight %", "Potential Weight %", "Target Weight %", "Snapshot ID", "Snapshot Timestamp", "Current Unit Cost (Original)") FROM stdin;
@@ -206,7 +206,7 @@ Total	NaN	NaN	NaN	22478.814	NaN	NaN	NaN	NaN	62076.31	63910.18	84555.13	1833.87	0
 
 
 --
--- Data for Name: ppr; Type: TABLE DATA; Schema: public; Owner: admin
+-- Data for Name: ppr; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.ppr ("Number", "Name", "Ticker", "Shares", "Average Unit Cost", "Current Unit Cost", "Purchased Value", "Market Value", "Balance", "Balance %", "Weight %", "Statement Date", "Snapshot ID", "Snapshot Timestamp") FROM stdin;

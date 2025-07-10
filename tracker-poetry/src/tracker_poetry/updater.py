@@ -147,3 +147,5 @@ else:
     if 'Equity' in args.portfolios:
         etl_equity(connection, filepath=porftolio_path)
         
+# close connection
+connection.close()

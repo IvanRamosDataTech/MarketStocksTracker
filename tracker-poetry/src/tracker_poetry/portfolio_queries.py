@@ -53,7 +53,7 @@ def connect_to_database(environment):
             database = database
         )
     except psycopg2.Error as e:
-        print (f'Can not connect to the postgress database "{DB_NAME}". Make sure database server is running')
+        print (f'Can not connect to the postgress database "{database}". Make sure database server is running')
         print (e)
     else:
         print (f'Connection to database "{database}" stablished. Listening at port {port}')

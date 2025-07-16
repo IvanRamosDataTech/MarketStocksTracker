@@ -27,6 +27,7 @@ def etl_ppr(connection, filepath):
     ppr_inserted_rows = sqlmanager.insert_snapshot(connection, "ppr", ppr_snapshot)
     #Verbose
     print(f"PPR Snapshot captured. Rows affected: {ppr_inserted_rows}\n\n")
+    print(ppr_snapshot[["Name", "Purchased Value", "Market Value", "Balance", "Snapshot ID", "Snapshot Timestamp"]])
 
     return ppr_inserted_rows
    
@@ -46,6 +47,7 @@ def etl_indexed(connection, filepath):
     indexed_inserted_rows = sqlmanager.insert_snapshot(connection, "indexed", indexed_snapshot)
     # Verbose
     print(f"Indexed Based Strategy Snapshot captured. Rows affected: {indexed_inserted_rows} \n\n")
+    print(indexed_snapshot[["Ticker", "Shares", "To Buy", "Snapshot ID", "Snapshot Timestamp"]])
     
     return indexed_inserted_rows
 
@@ -147,3 +149,5 @@ else:
     if 'Equity' in args.portfolios:
         etl_equity(connection, filepath=porftolio_path)
         
+# close connection
+connection.close()

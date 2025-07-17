@@ -22,11 +22,13 @@ def backup_database(environment="Development"):
     command = [
         "pg_dump",
         connection_string_arg,
-        f"--file={output_filename}",
+        f"--file={output_filename}",  # Temporary file to hold the raw dump
         "--inserts",    # generates INSERT statements
-        "--column-inserts",  # for explicit column names
-        "--clean",  # clean the database before restoring
-        "--if-exists",  # to avoid errors if the table already exists
+        "--schema=public",  # specify the schema to dump
+         "--clean",  # clean the database before restoring
+        "--if-exists",  # to avoid errors if the table already exists,
+        "--no-acl", # Prevents dumping access privileges (ACLs)
+        "-F", "p",  # format as plain text (It could also be t for tar or c for custom)
     ]
 
     # Run the command

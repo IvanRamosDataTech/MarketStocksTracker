@@ -1,0 +1,80 @@
+from multiprocessing import connection
+from dotenv import load_dotenv
+import os
+from pathlib import Path
+import argparse
+
+def backup_database(environment="Development"):
+    """
+    Backup the PostgreSQL database using pg_dump.
+    This function generates a logical backup file with schema and
+    data using INSERT statements.
+    """
+    import subprocess
+    from datetime import datetime   
+
+    conn_vars = get_env_vars(environment)
+    connection_string_arg = f"--dbname=postgresql://{conn_vars['user']}:{conn_vars['password']}@{conn_vars['host']}:{conn_vars['port']}/{conn_vars['dbname']}"
+
+    output_filename = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.sql"
+
+    # Define the command to run pg_dump
+    command = [
+        "pg_dump",
+        connection_string_arg,
+        f"--file={output_filename}",
+        "--inserts",    # generates INSERT statements
+        "--column-inserts",  # for explicit column names
+        "--clean",  # clean the database before restoring
+        "--if-exists",  # to avoid errors if the table already exists
+    ]
+
+    # Run the command
+    try:
+        subprocess.run(command, check=True)
+        print("Database backup completed successfully.\n Backup file:", output_filename)
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while backing up the database: {e}")
+
+def get_env_vars(environment) -> dict:
+    """
+    Retrieve environment variables for database connection from 
+    .env file, according to the specified environment.
+    - environment: 'Development' or 'Production'
+    
+    Returns a dictionary with the necessary connection parameters.
+    """
+    if environment == 'Development':
+        return {
+            "user": os.getenv("DB_USER_DEV"),
+            "password": os.getenv("DB_PASSWORD_DEV"),
+            "host": os.getenv("DB_SERVER_DEV"),
+            "port": os.getenv("DB_PORT_DEV"),
+            "dbname": os.getenv("DB_NAME_DEV")
+        }
+    elif environment == 'Production':
+        return {
+            "user": os.getenv("DB_USER"),
+            "password": os.getenv("DB_PASSWORD"),
+            "host": os.getenv("DB_SERVER"),
+            "port": os.getenv("DB_PORT"),
+            "dbname": os.getenv("DB_NAME")
+        }
+    else:
+        raise ValueError(f"Unknown environment {environment}")
+    
+if __name__ == "__main__":
+
+    config_path = Path(".env")
+    load_dotenv(dotenv_path=config_path)
+
+    parser = argparse.ArgumentParser(description="Backup PostgreSQL database.")
+    parser.add_argument("env", 
+                        help="Database environment to backup. Accepted values: Production | Development",
+                        type=str,
+                        choices=['Production', 'Development'])
+    
+    args = parser.parse_args()
+    
+    print(f"==== Backing up {args.env} database .... ===== ")
+    backup_database(args.env)

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import os
 from pathlib import Path
 import argparse
+import subprocess
 
 def backup_database(environment="Development"):
     """
@@ -10,7 +11,7 @@ def backup_database(environment="Development"):
     This function generates a logical backup file with schema and
     data using INSERT statements.
     """
-    import subprocess
+    
     from datetime import datetime   
 
     conn_vars = get_env_vars(environment)
@@ -37,6 +38,29 @@ def backup_database(environment="Development"):
         print("Database backup completed successfully.\n Backup file:", output_filename)
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while backing up the database: {e}")
+
+def restore_database(environment="Development", backup_file=None):
+    """
+    Restore the PostgreSQL database from a backup file.
+    This function uses psql to restore the database from a given backup file.
+    """
+    if not backup_file:
+        raise ValueError("Backup file must be specified for restoration.")
+
+    conn_vars = get_env_vars(environment)
+    connection_string_arg = f"--dbname=postgresql://{conn_vars['user']}:{conn_vars['password']}@{conn_vars['host']}:{conn_vars['port']}/{conn_vars['dbname']}"
+
+    command = [
+        "psql",
+        connection_string_arg,
+        "-f", backup_file
+    ]
+
+    try:
+        subprocess.run(command, check=True)
+        print("Database restoration completed successfully.")
+    except subprocess.CalledProcessError as e:
+        print(f"An error occurred while restoring the database: {e}")
 
 def get_env_vars(environment) -> dict:
     """
@@ -75,8 +99,22 @@ if __name__ == "__main__":
                         help="Database environment to backup. Accepted values: Production | Development",
                         type=str,
                         choices=['Production', 'Development'])
-    
+    parser.add_argument("mode",
+                        help="Mode: 'backup' to create a backup, 'restore' to restore from a backup file.",
+                        type=str,
+                        choices=['backup', 'restore'])
+    parser.add_argument("-f", "--backup-file",
+                        help="Path to the backup file to restore from. Required if mode is 'restore'.",
+                        type=str,
+                        required=False)    
     args = parser.parse_args()
-    
-    print(f"==== Backing up {args.env} database .... ===== ")
-    backup_database(args.env)
+
+    if args.mode == 'restore' and not args.backup_file:
+        parser.error("The --backup-file argument is required when mode is 'restore'.")
+
+    if args.mode == 'backup':
+        print(f"==== Backing up {args.env} database .... ===== ")
+        backup_database(args.env)
+    elif args.mode == 'restore':
+        print(f"==== Restoring {args.env} database .... ===== ")
+        restore_database(args.env, args.backup_file)

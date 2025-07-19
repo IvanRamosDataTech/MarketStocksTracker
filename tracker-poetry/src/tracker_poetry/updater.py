@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from pathlib import Path
 from datetime import datetime
 import argparse
-import onedrivedownloader as onedrive
+import onedrive_tool as onedrive
 
 ## Definitions
 

@@ -18,6 +18,8 @@ def backup_database(environment="Development"):
     connection_string_arg = f"--dbname=postgresql://{conn_vars['user']}:{conn_vars['password']}@{conn_vars['host']}:{conn_vars['port']}/{conn_vars['dbname']}"
 
     output_filename = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.sql"
+    if environment == 'Development':
+        output_filename = f"dev_{output_filename}"
 
     # Define the command to run pg_dump
     command = [
@@ -94,7 +96,7 @@ if __name__ == "__main__":
     config_path = Path(".env")
     load_dotenv(dotenv_path=config_path)
 
-    parser = argparse.ArgumentParser(description="Backup PostgreSQL database.")
+    parser = argparse.ArgumentParser(description="PostgreSQL database tools for MarketStocksTracker project.")
     parser.add_argument("env", 
                         help="Database environment to backup. Accepted values: Production | Development",
                         type=str,

@@ -175,3 +175,4 @@ cython_debug/
 # Excel files
 *.xlsx
 sqlscripts/migrations/*.sql
+tracker-poetry/poetry.lock

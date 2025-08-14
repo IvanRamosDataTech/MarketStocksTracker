@@ -60,45 +60,8 @@ Then a database `marketstockstracker` should be visible in Object Explorer. Open
 From there, Open up `create schema.sql` file using command Ctrl+o and execute its contents. Refresh your database schema and you should see tables there.
 
 ## Database Configuration
-As security rule, this project uses environment variables to prevent exposing any sensitive password. Make sure to create a new file `MarketStocksTracker/tracker-poetry/src/tracker_poetry/.env` like following one with your own configurations.
+As security rule, this project uses environment variables to prevent exposing any sensitive password. Make sure to create a new file `MarketStocksTracker/tracker-poetry/src/tracker_poetry/.env` copying contents from .env_sample and fill with your own configurations.
 
-```
-# .env file will enable you to use environment variables for local development without polluting the global environment namespace
-# It will also keep your environment variable names and values isolated to the same project that utilizes them.
-# .env file prevents you from directly writing down sensitive information in your code. Instead, processes inject environment variables at runtime.
-
-
-# Python environment
-APP_VERSION=0.1v
-
-# Database config
-
-# Development database credentials
-DB_SERVER_DEV=
-DB_PORT_DEV=
-DB_USER_DEV=
-DB_PASSWORD_DEV=
-DB_NAME_DEV=
-
-
-# Production database deployment credentials
-DB_SERVER=
-DB_PORT=
-DB_USER=
-DB_PASSWORD=
-DB_NAME=
-
-# Excel file config
-
-# Development File path
-EXCEL_FILE_DEV = "DEV Portafolio Indizado_Patrimonial.xlsx"
-#Production File path
-EXCEL_FILE = "Portafolio Indizado_Patrimonial.xlsx"
-# Azure App registration 
-AZURE_APP_ID = "your-azure-app-id"
-
-
-```
 
 ## Data source configuration
 
@@ -107,6 +70,8 @@ You'll need to specify relative paths for excel files as data sources (when loca
 # Excel file config
 
 # Development File path
+Also make sure to configure filepahts for your excel sheets.
+
 EXCEL_FILE_DEV = "./relative/path/to/dev excel.xlsx"
 
 #Production File path

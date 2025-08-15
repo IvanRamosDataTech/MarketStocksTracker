@@ -176,3 +176,6 @@ cython_debug/
 *.xlsx
 sqlscripts/migrations/*.sql
 tracker-poetry/poetry.lock
+tracker-poetry/.DS_Store
+.gitignore
+tracker-poetry/src/.DS_Store

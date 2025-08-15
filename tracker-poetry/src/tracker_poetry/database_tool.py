@@ -1,7 +1,5 @@
 from multiprocessing import connection
-from dotenv import load_dotenv
-import os
-from pathlib import Path
+from environment import EnvironmentLoader
 import argparse
 import subprocess
 
@@ -11,10 +9,10 @@ def backup_database(environment="Development"):
     This function generates a logical backup file with schema and
     data using INSERT statements.
     """
-    
     from datetime import datetime   
+    EnvironmentLoader.load(environment)
 
-    conn_vars = get_env_vars(environment)
+    conn_vars = EnvironmentLoader.get_db_vars()
     connection_string_arg = f"--dbname=postgresql://{conn_vars['user']}:{conn_vars['password']}@{conn_vars['host']}:{conn_vars['port']}/{conn_vars['dbname']}"
 
     output_filename = f"backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.sql"
@@ -48,8 +46,8 @@ def restore_database(environment="Development", backup_file=None):
     """
     if not backup_file:
         raise ValueError("Backup file must be specified for restoration.")
-
-    conn_vars = get_env_vars(environment)
+    EnvironmentLoader.load(environment)
+    conn_vars = EnvironmentLoader.get_db_vars()
     connection_string_arg = f"--dbname=postgresql://{conn_vars['user']}:{conn_vars['password']}@{conn_vars['host']}:{conn_vars['port']}/{conn_vars['dbname']}"
 
     command = [
@@ -63,39 +61,9 @@ def restore_database(environment="Development", backup_file=None):
         print("Database restoration completed successfully.")
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while restoring the database: {e}")
-
-def get_env_vars(environment) -> dict:
-    """
-    Retrieve environment variables for database connection from 
-    .env file, according to the specified environment.
-    - environment: 'Development' or 'Production'
-    
-    Returns a dictionary with the necessary connection parameters.
-    """
-    if environment == 'Development':
-        return {
-            "user": os.getenv("DB_USER_DEV"),
-            "password": os.getenv("DB_PASSWORD_DEV"),
-            "host": os.getenv("DB_SERVER_DEV"),
-            "port": os.getenv("DB_PORT_DEV"),
-            "dbname": os.getenv("DB_NAME_DEV")
-        }
-    elif environment == 'Production':
-        return {
-            "user": os.getenv("DB_USER"),
-            "password": os.getenv("DB_PASSWORD"),
-            "host": os.getenv("DB_SERVER"),
-            "port": os.getenv("DB_PORT"),
-            "dbname": os.getenv("DB_NAME")
-        }
-    else:
-        raise ValueError(f"Unknown environment {environment}")
     
 if __name__ == "__main__":
-
-    config_path = Path(".env")
-    load_dotenv(dotenv_path=config_path)
-
+   
     parser = argparse.ArgumentParser(description="PostgreSQL database tools for MarketStocksTracker project.")
     parser.add_argument("env", 
                         help="Database environment to backup. Accepted values: Production | Development",
@@ -110,6 +78,8 @@ if __name__ == "__main__":
                         type=str,
                         required=False)    
     args = parser.parse_args()
+
+    EnvironmentLoader.load(args.env)
 
     if args.mode == 'restore' and not args.backup_file:
         parser.error("The --backup-file argument is required when mode is 'restore'.")

@@ -30,7 +30,12 @@ def prod_loader():
     EnvironmentLoader.load("Production")
     return EnvironmentLoader
 
-def test_get_app_version(dev_loader, env_vars):
+def test_invalid_environment(env_vars):
+    with pytest.raises(ValueError) as excinfo:
+        EnvironmentLoader.load("InvalidEnvironment")
+    assert "Environment must be either 'Development' or 'Production'." in str(excinfo.value)
+
+def test_get_dev_app_version(dev_loader, env_vars):
     assert EnvironmentLoader.get_app_version() == "0.56.1beta"
     
 def test_get_app_version(prod_loader, env_vars):
@@ -38,19 +43,19 @@ def test_get_app_version(prod_loader, env_vars):
 
 def test_get_dev_db_vars(dev_loader, env_vars):
     db_vars = EnvironmentLoader.get_db_vars()
-    assert db_vars["DB_SERVER"] == "localhost"
-    assert db_vars["PORT"] == "1123"
-    assert db_vars["DB_NAME"] == "test_db"
-    assert db_vars["DB_USER"] == "test_user"
-    assert db_vars["DB_PASSWORD"] == "test_password"
+    assert db_vars["host"] == "localhost"
+    assert db_vars["port"] == "1123"
+    assert db_vars["dbname"] == "test_db"
+    assert db_vars["user"] == "test_user"
+    assert db_vars["password"] == "test_password"
 
 def test_get_prod_db_vars(prod_loader, env_vars):
     db_vars = EnvironmentLoader.get_db_vars()
-    assert db_vars["DB_SERVER"] == "db.supabase.urgttyz889"
-    assert db_vars["PORT"] == "5432"
-    assert db_vars["DB_NAME"] == "prod_db"
-    assert db_vars["DB_USER"] == "prod_user"
-    assert db_vars["DB_PASSWORD"] == "prod_password"
+    assert db_vars["host"] == "db.supabase.urgttyz889"
+    assert db_vars["port"] == "5432"
+    assert db_vars["dbname"] == "prod_db"
+    assert db_vars["user"] == "prod_user"
+    assert db_vars["password"] == "prod_password"
 
 
 def test_get_azure_ap_id(prod_loader, env_vars):

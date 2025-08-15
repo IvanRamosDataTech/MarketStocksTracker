@@ -35,11 +35,11 @@ class EnvironmentLoader:
     @staticmethod
     def get_db_vars() -> dict:
         return {
-            "DB_SERVER": EnvironmentLoader._get("DB_SERVER"),
-            "DB_NAME": EnvironmentLoader._get("DB_NAME"),
-            "DB_USER": EnvironmentLoader._get("DB_USER"),
-            "DB_PASSWORD": EnvironmentLoader._get("DB_PASSWORD"),
-            "PORT": EnvironmentLoader._get("DB_PORT")
+            "host": EnvironmentLoader._get("DB_SERVER"),
+            "dbname": EnvironmentLoader._get("DB_NAME"),
+            "user": EnvironmentLoader._get("DB_USER"),
+            "password": EnvironmentLoader._get("DB_PASSWORD"),
+            "port": EnvironmentLoader._get("DB_PORT")
         }
     
     @staticmethod

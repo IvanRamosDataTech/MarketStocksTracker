@@ -1,12 +1,10 @@
 
 import pandas as pd
 import portfolio_queries as sqlmanager
-import os
-from dotenv import load_dotenv
-from pathlib import Path
 from datetime import datetime
 import argparse
 import onedrive_tool as onedrive
+from environment import EnvironmentLoader
 
 ## Definitions
 
@@ -88,17 +86,11 @@ def get_data_source(environment, data_source):
 pd.set_option('display.max_rows', 100)
 pd.set_option('display.max_columns', 50)
 
-config_path = Path('.env')
-load_dotenv(dotenv_path=config_path)
-
-# TODO encapsulate connection to database with a funcion
-APP_VERSION = os.getenv('APP_VERSION')
-
 
 ## Insightful output data whenever the script runs, setup of arguments 
 parser = argparse.ArgumentParser(prog="Market Stocks Tracker",
                                  description="Stores portafolio updates from excel to database.",
-                                 epilog=f"Running version {APP_VERSION}")
+                                 epilog=f"Running version")
 parser.add_argument("env", 
                     help="Database environment system will interact with. Accepted values:  Production | Development",
                     type=str,
@@ -109,45 +101,31 @@ parser.add_argument("-p", "--portfolios",
                     required=True,
                     type=str,
                     choices=["All", "PPR", "Indexed", "Equity"])
-parser.add_argument("-d", "--data-source",
-                    help="Specifies the data source for the portfolio. Accepted values: Local, Cloud",
-                    type=str,
-                    choices=["Local", "Cloud"],
-                    default="Cloud") 
-
 args = parser.parse_args()
 
+#Environment resolution
+EnvironmentLoader.load(env=args.env)
 
 print(f"==== Updating Database from Excel portfolio sheet .... ===== ")
-print(f"Running Updater ETL process Environment: {args.env} version: {APP_VERSION}")
-print(f"Extracting data from: {args.data_source}")
+print(f"Running Updater ETL process Environment: {EnvironmentLoader.get_environment()} version: {EnvironmentLoader.get_app_version()}")
 
 ## Connect to database
-connection = sqlmanager.connect_to_database(environment=args.env)
+connection = sqlmanager.connect_to_database(environment=EnvironmentLoader.get_environment())
 
-if args.data_source == 'Local':
-    # Local file path
-    porftolio_path = get_data_source(environment=args.env, data_source=args.data_source)
-    #porftolio_path = Path(excel_local_file)
-elif args.data_source == 'Cloud':
-    # Cloud file path
-    porftolio_path = onedrive.get_portfolio(f"/Portfolios/{os.getenv('EXCEL_FILE_DEV') if args.env == 'Development' else os.getenv('EXCEL_FILE')}")
-else:
-    raise ValueError(f"Unknown data source {args.data_source}")
-
+portfolio_file = onedrive.get_portfolio(EnvironmentLoader.resolve_excel_file())
 
 if 'All' in args.portfolios:
     print(f"Running All portfolio updates ...\n\n")
-    etl_ppr(connection, filepath=porftolio_path)
-    etl_indexed(connection, filepath=porftolio_path)
-    etl_equity(connection, filepath=porftolio_path)
+    etl_ppr(connection, filepath=portfolio_file)
+    etl_indexed(connection, filepath=portfolio_file)
+    etl_equity(connection, filepath=portfolio_file)
 else:
     if 'PPR' in args.portfolios:
-        etl_ppr(connection, filepath=porftolio_path)
+        etl_ppr(connection, filepath=portfolio_file)
     if 'Indexed' in args.portfolios:
-        etl_indexed(connection, filepath=porftolio_path)
+        etl_indexed(connection, filepath=portfolio_file)
     if 'Equity' in args.portfolios:
-        etl_equity(connection, filepath=porftolio_path)
+        etl_equity(connection, filepath=portfolio_file)
         
 # close connection
 connection.close()

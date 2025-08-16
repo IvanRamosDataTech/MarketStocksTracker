@@ -12,8 +12,8 @@ class EnvironmentLoader:
 
     @classmethod
     def load(cls, env, dotenv_path=".env"):
-        if env not in ["Development", "Production"]:
-            raise ValueError("Environment must be either 'Development' or 'Production'.")
+        if env not in ["Development", "Production", "Testing"]:
+            raise ValueError("Environment must be either 'Development', 'Production' or 'Testing'.")
         cls._env = env
         if not cls._loaded:
             load_dotenv(dotenv_path=Path(dotenv_path))
@@ -26,7 +26,15 @@ class EnvironmentLoader:
 
     @staticmethod
     def _get(var_name, default=None):
-        return os.getenv(f"{var_name}_DEV" if EnvironmentLoader._env == "Development" else var_name, default)
+        _processed_var_name = None
+        if EnvironmentLoader._env == "Testing": 
+            _processed_var_name = f"{var_name}_TEST"
+        elif EnvironmentLoader._env == "Development":
+            _processed_var_name = f"{var_name}_DEV"
+        else:
+            _processed_var_name = var_name
+
+        return os.getenv(_processed_var_name, default)
 
     @staticmethod
     def get_environment() -> str:

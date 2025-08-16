@@ -18,6 +18,8 @@ def env_vars(monkeypatch):
     monkeypatch.setenv("DB_PASSWORD_DEV", "test_password")
     monkeypatch.setenv("AZURE_APP_ID", "80xb-1603-4bf229")
     monkeypatch.setenv("AZURE_APP_ID_DEV", "1111-2222-wweplt")
+    monkeypatch.setenv("EXCEL_FILE", "/Portfolios/prod_excel_file.xlsx")
+    monkeypatch.setenv("EXCEL_FILE_DEV", "/Portfolios/test_excel_file.xlsx")
     EnvironmentLoader._loaded = True  # Prevents loading .env
 
 @pytest.fixture
@@ -29,6 +31,12 @@ def dev_loader():
 def prod_loader():
     EnvironmentLoader.load("Production")
     return EnvironmentLoader
+
+def test_get_environment(dev_loader):
+    assert EnvironmentLoader.get_environment() == "Development"
+
+def test_get_environment(prod_loader):
+    assert EnvironmentLoader.get_environment() == "Production"
 
 def test_invalid_environment(env_vars):
     with pytest.raises(ValueError) as excinfo:
@@ -64,4 +72,8 @@ def test_get_azure_ap_id(prod_loader, env_vars):
 def test_get_azure_ap_id_dev(dev_loader, env_vars):
     assert EnvironmentLoader.get_azure_app_id() == "1111-2222-wweplt"
 
+def test_resolve_excel_file_path(dev_loader, env_vars):
+    assert EnvironmentLoader.resolve_excel_file() == "/Portfolios/test_excel_file.xlsx"
 
+def test_resolve_excel_file_path(prod_loader, env_vars):
+    assert EnvironmentLoader.resolve_excel_file() == "/Portfolios/prod_excel_file.xlsx"

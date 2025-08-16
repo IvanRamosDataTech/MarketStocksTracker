@@ -179,3 +179,4 @@ tracker-poetry/poetry.lock
 tracker-poetry/.DS_Store
 .gitignore
 tracker-poetry/src/.DS_Store
+tracker-poetry/src/tracker_poetry/.DS_Store

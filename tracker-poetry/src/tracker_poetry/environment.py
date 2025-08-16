@@ -29,6 +29,12 @@ class EnvironmentLoader:
         return os.getenv(f"{var_name}_DEV" if EnvironmentLoader._env == "Development" else var_name, default)
 
     @staticmethod
+    def get_environment() -> str:
+        if EnvironmentLoader._env is None:
+            raise ValueError("Environment not loaded. Call load() first.")
+        return EnvironmentLoader._env
+
+    @staticmethod
     def get_app_version() -> str:
         return EnvironmentLoader._get("APP_VERSION", "1.0.0")
     
@@ -46,4 +52,6 @@ class EnvironmentLoader:
     def get_azure_app_id():
         return EnvironmentLoader._get("AZURE_APP_ID")
 
-    
+    @staticmethod
+    def resolve_excel_file() -> str:
+        return EnvironmentLoader._get("EXCEL_FILE")

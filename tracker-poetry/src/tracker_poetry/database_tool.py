@@ -3,11 +3,13 @@ from environment import EnvironmentLoader
 import argparse
 import subprocess
 
-def backup_database(environment="Development"):
+def backup_database(environment="Development") -> str:
     """
     Backup the PostgreSQL database using pg_dump.
     This function generates a logical backup file with schema and
     data using INSERT statements.
+
+    Returns name of backup file
     """
     from datetime import datetime   
     EnvironmentLoader.load(environment)
@@ -36,6 +38,7 @@ def backup_database(environment="Development"):
     try:
         subprocess.run(command, check=True)
         print("Database backup completed successfully.\n Backup file:", output_filename)
+        return output_filename
     except subprocess.CalledProcessError as e:
         print(f"An error occurred while backing up the database: {e}")
 

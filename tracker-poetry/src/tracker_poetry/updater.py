@@ -3,6 +3,8 @@ import pandas as pd
 import portfolio_queries as sqlmanager
 from datetime import datetime
 import argparse
+import os
+import database_tool as dbtool
 import onedrive_tool as onedrive
 from environment import EnvironmentLoader
 
@@ -75,6 +77,10 @@ if __name__ == "__main__":
                         required=True,
                         type=str,
                         choices=["All", "PPR", "Indexed", "Equity"])
+    parser.add_argument("-b", "--backup",
+                        help="Uploads a backup copy of the portfolio file to OneDrive personal account",
+                        required=False,
+                        action="store_true")
     args = parser.parse_args()
 
     #Environment resolution
@@ -100,6 +106,11 @@ if __name__ == "__main__":
             etl_indexed(connection, source=portfolio_file)
         if 'Equity' in args.portfolios:
             etl_equity(connection, source=portfolio_file)
-            
+
+    if args.backup:
+        backup_file = dbtool.backup_database(EnvironmentLoader.get_environment())
+        onedrive.upload_backup_portfolio(backup_file)
+        os.remove(backup_file)
+
     # close connection
     connection.close()

@@ -141,7 +141,6 @@ def indexed_entries():
         }
     ])
 
-@pytest.mark.integration
 def test_initialized_manager_with_credentials(sql_manager):
     assert sql_manager.connection is not None
 

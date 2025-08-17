@@ -3,7 +3,6 @@
 """
 import psycopg2
 import tracker_poetry.constants as constants
-import os
 from psycopg2 import sql
 import datetime
 
@@ -94,7 +93,6 @@ class SQLManager:
         finally:
             cursor.close()
 
-    # TODO Adapt it to portfolio 
     def insert_snapshot(self, to_table, entries, auto_commit=True) -> int:
         """
         Performs upserts into a postgresql table from dataframe as source.
@@ -139,22 +137,3 @@ class SQLManager:
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
-
-# Usage example (remove or comment out in production):
-# with SQLManager('Development') as db:
-#     print(db.next_snapshot_ID('your_table'))
-    
-    # insert_values = sql.SQL(' VALUES ') + sql.SQL(',').join(values_array)
-    # insert_statement = date_config + insert_header + insert_values
-
-    # try:
-    #     cursor = connection.cursor()
-    #     cursor.execute(insert_statement)
-    #     connection.commit()
-    #     return cursor.rowcount
-    # except psycopg2.Error as e:
-    #     print("An error ocurred in database")
-    #     print (e)
-    #     return 0
-    # finally:
-    #     cursor.close()

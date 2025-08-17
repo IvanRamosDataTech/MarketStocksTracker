@@ -43,12 +43,56 @@ def ppr_entry():
     "Statement Date": "2024-01-01",
     "Snapshot ID": 1,
     "Snapshot Timestamp": "2024-01-01 12:00:00"
-}])  
+}])
 
-# def test_credentials(test_db_credentials):
-#     assert test_db_credentials["host"] == "db.fejnwiroicrcemokdefd.supabase.co"
-#     assert test_db_credentials["port"] == "5432"
-#     assert test_db_credentials["dbname"] == "postgres"
+@pytest.fixture
+def indexed_entry():
+    return pd.DataFrame([
+        {
+            "Number": "IDX001",
+            "Name": "Index Fund A",
+            "Ticker": "IDXA",
+            "Shares": 50.0,
+            "To Buy": 10.0,
+            "Average Unit Cost": 20.0,
+            "Potential Average Unit Cost": 19.5,
+            "Current Unit Cost": 21.0,
+            "Unit Cost Diff %": 0.0500,
+            "Purchased Value": 1000.00,
+            "Market Value": 1050.00,
+            "Potential Purchased Value": 1100.00,
+            "Balance": 50.00,
+            "Balance %": 0.0476,
+            "Current Weight %": 0.2000,
+            "Potential Weight %": 0.2200,
+            "Target Weight %": 0.2500,
+            "Snapshot ID": 1,
+            "Snapshot Timestamp": "2024-01-01 12:00:00",
+            "Current Unit Cost (Original)": 20.5
+        },
+        {
+            "Number": "IDX002",
+            "Name": "Index Fund B",
+            "Ticker": "IDXB",
+            "Shares": 75.0,
+            "To Buy": 5.0,
+            "Average Unit Cost": 30.0,
+            "Potential Average Unit Cost": 29.0,
+            "Current Unit Cost": 31.0,
+            "Unit Cost Diff %": 0.0667,
+            "Purchased Value": 2250.00,
+            "Market Value": 2325.00,
+            "Potential Purchased Value": 2350.00,
+            "Balance": 75.00,
+            "Balance %": 0.0323,
+            "Current Weight %": 0.3000,
+            "Potential Weight %": 0.3200,
+            "Target Weight %": 0.3500,
+            "Snapshot ID": 1,
+            "Snapshot Timestamp": "2024-01-01 12:00:00",
+            "Current Unit Cost (Original)": 30.5
+        }
+    ])
 
 def test_connection(sql_manager):
     assert sql_manager.connection is not None
@@ -59,6 +103,10 @@ def test_empty_sqlmanager(sql_manager_no_credentials):
 def test_insert_ppr_snapshot(sql_manager, ppr_entry):
     affected_rows = sql_manager.insert_snapshot(to_table="ppr", entries=ppr_entry, auto_commit=False)
     assert affected_rows == 1
+
+def test_insert_indexed_snapshot(sql_manager, indexed_entry):
+    affected_rows = sql_manager.insert_snapshot(to_table="indexed", entries=indexed_entry, auto_commit=False)
+    assert affected_rows == 2
 
 # def test_next_snapshot_id_empty_table(sql_manager):
 #     # Setup: Ensure the table is empty

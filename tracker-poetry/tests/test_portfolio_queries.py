@@ -5,7 +5,8 @@ import pandas as pd
 import datetime
 import tracker_poetry.constants as constants
 
-## Integration Tests for SQLManager class
+## All tests are Integration Tests for SQLManager class
+pytestmark = pytest.mark.integration
 
 @pytest.fixture
 def test_db_credentials():
@@ -140,6 +141,7 @@ def indexed_entries():
         }
     ])
 
+@pytest.mark.integration
 def test_initialized_manager_with_credentials(sql_manager):
     assert sql_manager.connection is not None
 
@@ -157,10 +159,21 @@ def test_close_connection(test_db_credentials):
     manager.close()
     assert manager.connection is None
 
+def test_attempt_close_already_closed_connection(test_db_credentials):
+    manager = SQLManager()
+    manager.connect_to_database(test_db_credentials)
+    manager.close()
+    manager.close()
+    
+@pytest.mark.slow
 def test_insert_ppr_snapshot(sql_manager, ppr_entry):
     affected_rows = sql_manager.insert_snapshot(to_table="ppr", entries=ppr_entry, auto_commit=False)
     assert affected_rows == 1
 
+# poetry run pytest -m "not slow" to skip slow tests
+# poetry run pytest -m slow to run slow tests
+# poetry run pytest -m "slow and integration" to run integration tests that are also slow
+@pytest.mark.slow
 def test_insert_indexed_snapshot(sql_manager, indexed_entries):
     affected_rows = sql_manager.insert_snapshot(to_table="indexed", entries=indexed_entries, auto_commit=False)
     assert affected_rows == 4

@@ -5,6 +5,7 @@ import psycopg2
 import tracker_poetry.constants as constants
 import os
 from psycopg2 import sql
+import datetime
 
 
 class SQLManager:
@@ -68,9 +69,10 @@ class SQLManager:
         finally:
             cursor.close()
 
-    def last_update(self, table):
+    def last_update(self, table) -> datetime.datetime:
         """
         Finds out last registered snapshot date in database.
+        
         Returns last registered date for a captured snapshot, or default if error.
         """
         try:

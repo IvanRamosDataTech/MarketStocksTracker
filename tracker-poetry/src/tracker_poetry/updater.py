@@ -1,6 +1,6 @@
 
 import pandas as pd
-import portfolio_queries as sqlmanager
+from portfolio_queries import SQLManager
 from datetime import datetime
 import argparse
 import os
@@ -10,7 +10,11 @@ from environment import EnvironmentLoader
 
 ## Definitions
 
-def etl_ppr(connection, source):
+def etl_ppr(manager: SQLManager, source):
+    """
+    manager - a SQL manager that can interact with database
+    source - data source to extract info from
+    """
     
     # Verbose
     ppr_allianz = pd.read_excel(source, sheet_name="Allianz", header=None)  
@@ -19,12 +23,12 @@ def etl_ppr(connection, source):
     # Extract data from excel
     ppr_snapshot = pd.read_excel(source, sheet_name="Indizado PPR", header=4)   
     # Transform it
-    next_ppr_snapshotID = sqlmanager.next_snapshot_ID(connection, "ppr")
+    next_ppr_snapshotID = manager.next_snapshot_ID("ppr")
     ppr_snapshot["Snapshot ID"] = next_ppr_snapshotID
     ppr_snapshot["Snapshot Timestamp"] = datetime.now()
     ppr_snapshot["Statement Date"] = last_ppr_update
     # Load data into Database
-    ppr_inserted_rows = sqlmanager.insert_snapshot(connection, "ppr", ppr_snapshot)
+    ppr_inserted_rows = manager.insert_snapshot(to_table="ppr", entries=ppr_snapshot)
     #Verbose
     print(f"PPR Snapshot captured. Rows affected: {ppr_inserted_rows}")
     print(ppr_snapshot[["Name", "Purchased Value", "Market Value", "Balance", "Snapshot ID", "Snapshot Timestamp"]], "\n\n")
@@ -32,19 +36,19 @@ def etl_ppr(connection, source):
     return ppr_inserted_rows
    
 
-def etl_indexed(connection, source):
+def etl_indexed(manager: SQLManager, source):
     #Verbose
-    last_date = sqlmanager.last_update(connection, "indexed")
+    last_date = manager.last_update("indexed")
     print(f"Last Indexed Strategy investment {last_date}")
     # Extract data from excel
     indexed_snapshot = pd.read_excel(source, sheet_name="Indizado FIRE", header=4)
     # Transform
     indexed_snapshot.drop(columns=["Ticker Full Name"], inplace=True)
-    next_indexed_snapshotID = sqlmanager.next_snapshot_ID(connection, "indexed")
+    next_indexed_snapshotID = manager.next_snapshot_ID(table="indexed")
     indexed_snapshot["Snapshot ID"] = next_indexed_snapshotID
     indexed_snapshot["Snapshot Timestamp"] = datetime.now()
     # Load into database
-    indexed_inserted_rows = sqlmanager.insert_snapshot(connection, "indexed", indexed_snapshot)
+    indexed_inserted_rows = manager.insert_snapshot(to_table="indexed", entries=indexed_snapshot)
     # Verbose
     print(f"Indexed Based Strategy Snapshot captured. Rows affected: {indexed_inserted_rows}")
     print(indexed_snapshot[["Ticker", "Shares", "To Buy", "Snapshot ID", "Snapshot Timestamp"]], "\n\n")
@@ -52,7 +56,7 @@ def etl_indexed(connection, source):
     return indexed_inserted_rows
 
 
-def etl_equity(connection, source):
+def etl_equity(manager: SQLManager, source):
     # TODO Perform equity snapshots
     print(f"TODO: Perform Equity Strategy snapshots \n")
 
@@ -90,22 +94,22 @@ if __name__ == "__main__":
     print(f"Running Updater ETL process Environment: {EnvironmentLoader.get_environment()} version: {EnvironmentLoader.get_app_version()}")
 
     ## Connect to database
-    connection = sqlmanager.connect_to_database(environment=EnvironmentLoader.get_environment())
+    sqlmanager = SQLManager(credentials=EnvironmentLoader.get_db_vars())
 
     portfolio_file = onedrive.get_portfolio(EnvironmentLoader.resolve_excel_file())
 
     if 'All' in args.portfolios:
         print(f"Running All portfolio updates ...\n\n")
-        etl_ppr(connection, source=portfolio_file)
-        etl_indexed(connection, source=portfolio_file)
-        etl_equity(connection, source=portfolio_file)
+        etl_ppr(sqlmanager, source=portfolio_file)
+        etl_indexed(sqlmanager, source=portfolio_file)
+        etl_equity(sqlmanager, source=portfolio_file)
     else:
         if 'PPR' in args.portfolios:
-            etl_ppr(connection, source=portfolio_file)
+            etl_ppr(sqlmanager, source=portfolio_file)
         if 'Indexed' in args.portfolios:
-            etl_indexed(connection, source=portfolio_file)
+            etl_indexed(sqlmanager, source=portfolio_file)
         if 'Equity' in args.portfolios:
-            etl_equity(connection, source=portfolio_file)
+            etl_equity(sqlmanager, source=portfolio_file)
 
     if args.backup:
         backup_file = dbtool.backup_database(EnvironmentLoader.get_environment())
@@ -113,4 +117,4 @@ if __name__ == "__main__":
         os.remove(backup_file)
 
     # close connection
-    connection.close()
+    sqlmanager.close()

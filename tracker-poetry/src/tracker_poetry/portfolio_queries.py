@@ -4,6 +4,7 @@
 import psycopg2
 import tracker_poetry.constants as constants
 from psycopg2 import sql
+import pandas
 import datetime
 
 
@@ -43,7 +44,7 @@ class SQLManager:
             self.connection = connection
             return connection
 
-    def next_snapshot_ID(self, table) -> int:
+    def next_snapshot_ID(self, table: str) -> int:
         """
         Finds out last registered snapshot in Database.
         
@@ -93,7 +94,7 @@ class SQLManager:
         finally:
             cursor.close()
 
-    def insert_snapshot(self, to_table, entries, auto_commit=True) -> int:
+    def insert_snapshot(self, to_table: str, entries: pandas.DataFrame, auto_commit=True) -> int:
         """
         Performs upserts into a postgresql table from dataframe as source.
         

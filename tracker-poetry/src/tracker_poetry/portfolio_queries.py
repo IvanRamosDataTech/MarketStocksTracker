@@ -43,7 +43,7 @@ class SQLManager:
             self.connection = connection
             return connection
 
-    def next_snapshot_ID(self, table):
+    def next_snapshot_ID(self, table) -> int:
         """
         Finds out last registered snapshot in Database.
         

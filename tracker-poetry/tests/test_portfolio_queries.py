@@ -46,7 +46,7 @@ def ppr_entry():
 }])
 
 @pytest.fixture
-def indexed_entry():
+def indexed_entries():
     return pd.DataFrame([
         {
             "Number": "IDX001",
@@ -91,6 +91,50 @@ def indexed_entry():
             "Snapshot ID": 1,
             "Snapshot Timestamp": "2024-01-01 12:00:00",
             "Current Unit Cost (Original)": 30.5
+        },
+        {
+            "Number": "GKXX515",
+            "Name": "Debt Fund",
+            "Ticker": "GUBX",
+            "Shares": 42.8,
+            "To Buy": 0,
+            "Average Unit Cost": 17.50,
+            "Potential Average Unit Cost": 17.50,
+            "Current Unit Cost": 15.82,
+            "Unit Cost Diff %": -0.0667,
+            "Purchased Value": 4520.00,
+            "Market Value": 4427.816,
+            "Potential Purchased Value": 16.30,
+            "Balance": 75.00,
+            "Balance %": 0.0323,
+            "Current Weight %": 0.3000,
+            "Potential Weight %": 0.3200,
+            "Target Weight %": 0.3500,
+            "Snapshot ID": 2,
+            "Snapshot Timestamp": "2024-12-24 18:19:32",
+            "Current Unit Cost (Original)": 30.5
+        },
+        {
+            "Number": "23BB08",
+            "Name": "Bovespra Ltd",
+            "Ticker": "BVP",
+            "Shares": 42.8,
+            "To Buy": 0,
+            "Average Unit Cost": 17.50,
+            "Potential Average Unit Cost": 17.50,
+            "Current Unit Cost": 15.82,
+            "Unit Cost Diff %": -0.0667,
+            "Purchased Value": 4520.00,
+            "Market Value": 4427.816,
+            "Potential Purchased Value": 16.30,
+            "Balance": 75.00,
+            "Balance %": 0.0323,
+            "Current Weight %": 0.3000,
+            "Potential Weight %": 0.3200,
+            "Target Weight %": 0.3500,
+            "Snapshot ID": 2,
+            "Snapshot Timestamp": "2024-12-24 18:19:32",
+            "Current Unit Cost (Original)": 30.5
         }
     ])
 
@@ -108,9 +152,18 @@ def test_insert_ppr_snapshot(sql_manager, ppr_entry):
     affected_rows = sql_manager.insert_snapshot(to_table="ppr", entries=ppr_entry, auto_commit=False)
     assert affected_rows == 1
 
-def test_insert_indexed_snapshot(sql_manager, indexed_entry):
-    affected_rows = sql_manager.insert_snapshot(to_table="indexed", entries=indexed_entry, auto_commit=False)
-    assert affected_rows == 2
+def test_insert_indexed_snapshot(sql_manager, indexed_entries):
+    affected_rows = sql_manager.insert_snapshot(to_table="indexed", entries=indexed_entries, auto_commit=False)
+    assert affected_rows == 4
+
+def test_next_snapshot_id(sql_manager, indexed_entries):
+    #Arrange: Insert some entries first 
+    sql_manager.insert_snapshot(to_table="indexed", entries=indexed_entries, auto_commit=False)
+    # Act, get the next snapshot ID
+    next_id = sql_manager.next_snapshot_ID(table="indexed")
+    # Assert expected snapshot ID
+    assert next_id == 3  # Assuming the last snapshot was 2 after inserting indexed entries
+
 
 # def test_next_snapshot_id_empty_table(sql_manager):
 #     # Setup: Ensure the table is empty

@@ -20,7 +20,7 @@ class SQLManager:
             date_style = sql.Identifier(constants.DB_DATE_STYLE)
         )
 
-    def connect_to_database(self, credentials):
+    def connect_to_database(self, credentials) -> psycopg2.extensions.connection:
         '''
             Tries to connect to specific database according to selected environment
             
@@ -40,6 +40,7 @@ class SQLManager:
             print (e)
         else:
             print (f'Connection to database "{credentials["dbname"]}" stablished. Listening at port {credentials["port"]}')
+            self.connection = connection
             return connection
 
     def next_snapshot_ID(self, table):

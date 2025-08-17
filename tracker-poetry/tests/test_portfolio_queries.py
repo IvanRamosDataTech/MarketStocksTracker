@@ -94,11 +94,15 @@ def indexed_entry():
         }
     ])
 
-def test_connection(sql_manager):
+def test_initialized_manager_with_credentials(sql_manager):
     assert sql_manager.connection is not None
 
 def test_empty_sqlmanager(sql_manager_no_credentials):
     assert sql_manager_no_credentials.connection is None
+
+def test_connection(sql_manager_no_credentials, test_db_credentials):
+    sql_manager_no_credentials.connect_to_database(test_db_credentials)
+    assert sql_manager_no_credentials.connection is not None
 
 def test_insert_ppr_snapshot(sql_manager, ppr_entry):
     affected_rows = sql_manager.insert_snapshot(to_table="ppr", entries=ppr_entry, auto_commit=False)

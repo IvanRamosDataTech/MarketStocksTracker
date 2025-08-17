@@ -150,6 +150,13 @@ def test_connection(sql_manager_no_credentials, test_db_credentials):
     sql_manager_no_credentials.connect_to_database(test_db_credentials)
     assert sql_manager_no_credentials.connection is not None
 
+def test_close_connection(test_db_credentials):
+    manager = SQLManager()
+    manager.connect_to_database(test_db_credentials)
+    assert manager.connection is not None
+    manager.close()
+    assert manager.connection is None
+
 def test_insert_ppr_snapshot(sql_manager, ppr_entry):
     affected_rows = sql_manager.insert_snapshot(to_table="ppr", entries=ppr_entry, auto_commit=False)
     assert affected_rows == 1
@@ -182,3 +189,4 @@ def test_last_update(sql_manager, indexed_entries):
 def test_last_update_empty_table(sql_manager):
     last_update = sql_manager.last_update(table="indexed")
     assert last_update == constants.DEFAULT_SNAPSHOT_DATE
+

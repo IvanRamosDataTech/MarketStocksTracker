@@ -131,6 +131,7 @@ class SQLManager:
         """
         if self.connection:
             self.connection.close()
+            self.connection = None
             print("Database connection closed.")
 
     def __enter__(self):

@@ -1,153 +1,120 @@
 
 import pandas as pd
-import portfolio_queries as sqlmanager
-import os
-from dotenv import load_dotenv
-from pathlib import Path
+from portfolio_queries import SQLManager
 from datetime import datetime
 import argparse
-import onedrivedownloader as onedrive
+import os
+import database_tool as dbtool
+import onedrive_tool as onedrive
+from environment import EnvironmentLoader
 
 ## Definitions
 
-def etl_ppr(connection, filepath):
+def etl_ppr(manager: SQLManager, source):
+    """
+    manager - a SQL manager that can interact with database
+    source - data source to extract info from
+    """
     
     # Verbose
-    ppr_allianz = pd.read_excel(filepath, sheet_name="Allianz", header=None)  
+    ppr_allianz = pd.read_excel(source, sheet_name="Allianz", header=None)  
     last_ppr_update = ppr_allianz.iat[0, 1]
     print(f"Last Allianz report  {last_ppr_update}")
     # Extract data from excel
-    ppr_snapshot = pd.read_excel(filepath, sheet_name="Indizado PPR", header=4)   
+    ppr_snapshot = pd.read_excel(source, sheet_name="Indizado PPR", header=4)   
     # Transform it
-    next_ppr_snapshotID = sqlmanager.next_snapshot_ID(connection, "ppr")
+    next_ppr_snapshotID = manager.next_snapshot_ID("ppr")
     ppr_snapshot["Snapshot ID"] = next_ppr_snapshotID
     ppr_snapshot["Snapshot Timestamp"] = datetime.now()
     ppr_snapshot["Statement Date"] = last_ppr_update
     # Load data into Database
-    ppr_inserted_rows = sqlmanager.insert_snapshot(connection, "ppr", ppr_snapshot)
+    ppr_inserted_rows = manager.insert_snapshot(to_table="ppr", entries=ppr_snapshot)
     #Verbose
-    print(f"PPR Snapshot captured. Rows affected: {ppr_inserted_rows}\n\n")
-    print(ppr_snapshot[["Name", "Purchased Value", "Market Value", "Balance", "Snapshot ID", "Snapshot Timestamp"]])
+    print(f"PPR Snapshot captured. Rows affected: {ppr_inserted_rows}")
+    print(ppr_snapshot[["Name", "Purchased Value", "Market Value", "Balance", "Snapshot ID", "Snapshot Timestamp"]], "\n\n")
 
     return ppr_inserted_rows
    
 
-def etl_indexed(connection, filepath):
+def etl_indexed(manager: SQLManager, source):
     #Verbose
-    last_date = sqlmanager.last_update(connection, "indexed")
+    last_date = manager.last_update("indexed")
     print(f"Last Indexed Strategy investment {last_date}")
     # Extract data from excel
-    indexed_snapshot = pd.read_excel(filepath, sheet_name="Indizado FIRE", header=4)
+    indexed_snapshot = pd.read_excel(source, sheet_name="Indizado FIRE", header=4)
     # Transform
     indexed_snapshot.drop(columns=["Ticker Full Name"], inplace=True)
-    next_indexed_snapshotID = sqlmanager.next_snapshot_ID(connection, "indexed")
+    next_indexed_snapshotID = manager.next_snapshot_ID(table="indexed")
     indexed_snapshot["Snapshot ID"] = next_indexed_snapshotID
     indexed_snapshot["Snapshot Timestamp"] = datetime.now()
     # Load into database
-    indexed_inserted_rows = sqlmanager.insert_snapshot(connection, "indexed", indexed_snapshot)
+    indexed_inserted_rows = manager.insert_snapshot(to_table="indexed", entries=indexed_snapshot)
     # Verbose
-    print(f"Indexed Based Strategy Snapshot captured. Rows affected: {indexed_inserted_rows} \n\n")
-    print(indexed_snapshot[["Ticker", "Shares", "To Buy", "Snapshot ID", "Snapshot Timestamp"]])
+    print(f"Indexed Based Strategy Snapshot captured. Rows affected: {indexed_inserted_rows}")
+    print(indexed_snapshot[["Ticker", "Shares", "To Buy", "Snapshot ID", "Snapshot Timestamp"]], "\n\n")
     
     return indexed_inserted_rows
 
 
-def etl_equity(connection, filepath):
+def etl_equity(manager: SQLManager, source):
     # TODO Perform equity snapshots
-    print(f"TODO: Perform Equity Startegy snapshots \n")
-    
+    print(f"TODO: Perform Equity Strategy snapshots \n")
+
     return
-
-# Function to determine the data source based on the environment and data source depending on argument --data-source
-def get_data_source(environment, data_source):
-    """
-    Determines the Excel file path based on environment and data source.
-    - environment: 'Development' or 'Production'
-    - data_source: 'Local' or 'Cloud'
-    Returns the appropriate file path or identifier.
-    """
-    if data_source == 'Local':
-        if environment == 'Development':
-            return os.getenv('EXCEL_FILE_DEV')
-        elif environment == 'Production':
-            return os.getenv('EXCEL_FILE')
-        else:
-            raise ValueError(f"Unknown environment {environment}")
-    elif data_source == 'Cloud':
-        if environment == 'Development':
-            return f"/Portfolios/{os.getenv('EXCEL_FILE_DEV')}"
-        elif environment == 'Production':
-            return f"/Portfolios/{os.getenv('EXCEL_FILE')}"
-        else:
-            raise ValueError(f"Unknown environment {environment}")
-    else:
-        raise ValueError(f"Unknown data source {data_source}")
-
 
 ### Script setup
 pd.set_option('display.max_rows', 100)
 pd.set_option('display.max_columns', 50)
 
-config_path = Path('.env')
-load_dotenv(dotenv_path=config_path)
+if __name__ == "__main__":
+    ## Insightful output data whenever the script runs, setup of arguments 
+    parser = argparse.ArgumentParser(prog="Market Stocks Tracker",
+                                    description="Stores portafolio updates from excel to database.",
+                                    epilog=f"Running version")
+    parser.add_argument("env", 
+                        help="Database environment system will interact with. Accepted values:  Production | Development",
+                        type=str,
+                        choices=['Production', 'Development'])
+    parser.add_argument("-p", "--portfolios",
+                        help= "Selectts portfolio(s) to be updated. Accepted values: All, PPR, Indexed, Equity",
+                        nargs="+",
+                        required=True,
+                        type=str,
+                        choices=["All", "PPR", "Indexed", "Equity"])
+    parser.add_argument("-b", "--backup",
+                        help="Uploads a backup copy of the portfolio file to OneDrive personal account",
+                        required=False,
+                        action="store_true")
+    args = parser.parse_args()
 
-# TODO encapsulate connection to database with a funcion
-APP_VERSION = os.getenv('APP_VERSION')
+    #Environment resolution
+    EnvironmentLoader.load(env=args.env)
 
+    print(f"==== Updating Database from Excel portfolio sheet .... ===== ")
+    print(f"Running Updater ETL process Environment: {EnvironmentLoader.get_environment()} version: {EnvironmentLoader.get_app_version()}")
 
-## Insightful output data whenever the script runs, setup of arguments 
-parser = argparse.ArgumentParser(prog="Market Stocks Tracker",
-                                 description="Stores portafolio updates from excel to database.",
-                                 epilog=f"Running version {APP_VERSION}")
-parser.add_argument("env", 
-                    help="Database environment system will interact with. Accepted values:  Production | Development",
-                    type=str,
-                    choices=['Production', 'Development'])
-parser.add_argument("-p", "--portfolios",
-                    help= "Selectts portfolio(s) to be updated. Accepted values: All, PPR, Indexed, Equity",
-                    nargs="+",
-                    required=True,
-                    type=str,
-                    choices=["All", "PPR", "Indexed", "Equity"])
-parser.add_argument("-d", "--data-source",
-                    help="Specifies the data source for the portfolio. Accepted values: Local, Cloud",
-                    type=str,
-                    choices=["Local", "Cloud"],
-                    default="Cloud") 
+    ## Connect to database
+    sqlmanager = SQLManager(credentials=EnvironmentLoader.get_db_vars())
 
-args = parser.parse_args()
+    portfolio_file = onedrive.get_portfolio(EnvironmentLoader.resolve_excel_file())
 
+    if 'All' in args.portfolios:
+        print(f"Running All portfolio updates ...\n\n")
+        etl_ppr(sqlmanager, source=portfolio_file)
+        etl_indexed(sqlmanager, source=portfolio_file)
+        etl_equity(sqlmanager, source=portfolio_file)
+    else:
+        if 'PPR' in args.portfolios:
+            etl_ppr(sqlmanager, source=portfolio_file)
+        if 'Indexed' in args.portfolios:
+            etl_indexed(sqlmanager, source=portfolio_file)
+        if 'Equity' in args.portfolios:
+            etl_equity(sqlmanager, source=portfolio_file)
 
-print(f"==== Updating Database from Excel portfolio sheet .... ===== ")
-print(f"Running Updater ETL process Environment: {args.env} version: {APP_VERSION}")
-print(f"Extracting data from: {args.data_source}")
+    if args.backup:
+        backup_file = dbtool.backup_database(EnvironmentLoader.get_environment())
+        onedrive.upload_backup_portfolio(backup_file)
+        os.remove(backup_file)
 
-## Connect to database
-connection = sqlmanager.connect_to_database(environment=args.env)
-
-if args.data_source == 'Local':
-    # Local file path
-    porftolio_path = get_data_source(environment=args.env, data_source=args.data_source)
-    #porftolio_path = Path(excel_local_file)
-elif args.data_source == 'Cloud':
-    # Cloud file path
-    porftolio_path = onedrive.get_portfolio(f"/Portfolios/{os.getenv('EXCEL_FILE_DEV') if args.env == 'Development' else os.getenv('EXCEL_FILE')}")
-else:
-    raise ValueError(f"Unknown data source {args.data_source}")
-
-
-if 'All' in args.portfolios:
-    print(f"Running All portfolio updates ...\n\n")
-    etl_ppr(connection, filepath=porftolio_path)
-    etl_indexed(connection, filepath=porftolio_path)
-    etl_equity(connection, filepath=porftolio_path)
-else:
-    if 'PPR' in args.portfolios:
-        etl_ppr(connection, filepath=porftolio_path)
-    if 'Indexed' in args.portfolios:
-        etl_indexed(connection, filepath=porftolio_path)
-    if 'Equity' in args.portfolios:
-        etl_equity(connection, filepath=porftolio_path)
-        
-# close connection
-connection.close()
+    # close connection
+    sqlmanager.close()

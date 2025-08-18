@@ -13,10 +13,11 @@ dependencies = [
     "pandas (>=2.2.3,<3.0.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
     "xlsxwriter (>=3.2.2,<4.0.0)",
-    "psycopg2 (>=2.9.10,<3.0.0)",
     "python-dotenv (>=1.0.1,<2.0.0)",
     "msal (>=1.32.3,<2.0.0)",
     "requests (>=2.32.3,<3.0.0)",
+    "psycopg2 (>=2.9.10,<3.0.0)",
+    "pytest (>=8.4.1,<9.0.0)",
 ]
 
 [tool.poetry]
@@ -26,3 +27,10 @@ packages = [{include = "tracker_poetry", from = "src"}]
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: integration tests that run over some infrastructure"
+]
+    
